@@ -21,14 +21,13 @@ def simple_sentiment(text: str) -> str:
 def home():
     sentiment = None
     text = ""
-
-    if request.method == "POST":
+if request.method == "POST":
         import time
         time.sleep(2)
         text = request.form.get("text", "")
         sentiment = simple_sentiment(text)
-        return render_template("index.html", sentiment=sentiment, text=text)
-
+    
+    html", sentiment=sentiment, text=text)
 
 @app.route("/predict", methods=["POST"])
 def predict():
