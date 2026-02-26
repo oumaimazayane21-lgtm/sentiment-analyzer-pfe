@@ -9,26 +9,41 @@
 <body>
   <div class="card">
     <h1>Sentiment Analyzer</h1>
-    <p class="sub">Write a sentence and click Analyze. The backend will return Positive / Negative / Neutral.</p>
+    <p class="sub">Write a sentence and click Analyze. You’ll get label + scores.</p>
 
     <form method="POST" action="/">
       <textarea name="text" placeholder="Write something..." required>{{ text or "" }}</textarea>
+
       <button type="submit" id="analyzeBtn">
-    <span id="btnText">Analyze</span>
-    <span id="loader" class="loader" style="display:none;"></span>
-</button>
+        <span id="btnText">Analyze</span>
+        <span id="loader" class="loader" style="display:none;"></span>
+      </button>
     </form>
 
-    {% if sentiment %}
+    {% if result %}
       <div class="result">
-        <div class="badge {{ sentiment|lower }}">
-          {% if sentiment|lower == "positive" %}✅{% elif sentiment|lower == "negative" %}❌{% else %}⚠️{% endif %}
-          <span>Sentiment: {{ sentiment }}</span>
+        <div class="badge {{ result.label|lower }}">
+          {% if result.label|lower == "positive" %}✅{% elif result.label|lower == "negative" %}❌{% else %}⚠️{% endif %}
+          <span>Sentiment: {{ result.label }}</span>
         </div>
+
+        <div class="scores">
+          <div>Positive: <b>{{ result.pos_pct }}%</b></div>
+          <div>Neutral: <b>{{ result.neu_pct }}%</b></div>
+          <div>Negative: <b>{{ result.neg_pct }}%</b></div>
+          <div class="small">Compound: <b>{{ result.compound }}</b></div>
+        </div>
+
+        <div class="bar">
+          <div class="bar-fill {{ result.label|lower }}" style="width: {{ result.compound_pct }}%;"></div>
+        </div>
+        <div class="small">Overall score: {{ result.compound_pct }}%</div>
+
         <small class="hint">Tip: Try “I love this product” vs “This product is bad”.</small>
       </div>
     {% endif %}
   </div>
+
 <script>
 const form = document.querySelector("form");
 const button = document.getElementById("analyzeBtn");
@@ -36,9 +51,9 @@ const btnText = document.getElementById("btnText");
 const loader = document.getElementById("loader");
 
 form.addEventListener("submit", function() {
-    button.disabled = true;
-    btnText.textContent = "Analyzing...";
-    loader.style.display = "inline-block";
+  button.disabled = true;
+  btnText.textContent = "Analyzing...";
+  loader.style.display = "inline-block";
 });
 </script>
 </body>

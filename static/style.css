@@ -111,3 +111,32 @@ small.hint {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
+.scores{
+  margin-top: 12px;
+  display: grid;
+  gap: 6px;
+}
+
+.small{
+  opacity: 0.85;
+  font-size: 13px;
+  margin-top: 6px;
+}
+
+.bar{
+  margin-top: 12px;
+  height: 12px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.12);
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.14);
+}
+
+.bar-fill{
+  height: 100%;
+  width: 0%;
+}
+
+.bar-fill.positive{ background: #22c55e; }
+.bar-fill.negative{ background: #ef4444; }
+.bar-fill.neutral{  background: #f59e0b; }

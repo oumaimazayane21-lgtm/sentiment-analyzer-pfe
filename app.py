@@ -1,47 +1,58 @@
 from flask import Flask, render_template, request, jsonify
-import time
+from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 
 app = Flask(__name__)
+analyzer = SentimentIntensityAnalyzer()
 
-def simple_sentiment(text: str) -> str:
-    t = text.lower()
+def vader_analyze(text: str):
+    scores = analyzer.polarity_scores(text)
+    compound = scores["compound"]
 
-    positive_words = ["love", "good", "great", "amazing", "excellent", "perfect", "like"]
-    negative_words = ["bad", "hate", "worst", "awful", "terrible", "poor"]
-
-    pos = sum(w in t for w in positive_words)
-    neg = sum(w in t for w in negative_words)
-
-    if pos > neg:
-        return "Positive"
-    elif neg > pos:
-        return "Negative"
+    if compound >= 0.05:
+        label = "Positive"
+    elif compound <= -0.05:
+        label = "Negative"
     else:
-        return "Neutral"
+        label = "Neutral"
+
+    # percentages (0..100)
+    pos_pct = round(scores["pos"] * 100, 1)
+    neu_pct = round(scores["neu"] * 100, 1)
+    neg_pct = round(scores["neg"] * 100, 1)
+
+    # compound to percent (0..100) just for UI bar
+    compound_pct = round((compound + 1) / 2 * 100, 1)
+
+    return {
+        "label": label,
+        "scores": scores,
+        "pos_pct": pos_pct,
+        "neu_pct": neu_pct,
+        "neg_pct": neg_pct,
+        "compound": compound,
+        "compound_pct": compound_pct,
+    }
 
 
 @app.route("/", methods=["GET", "POST"])
 def home():
-    sentiment = None
+    result = None
     text = ""
 
     if request.method == "POST":
-        time.sleep(2)  # باش يبان spinner
         text = request.form.get("text", "")
-        sentiment = simple_sentiment(text)
+        result = vader_analyze(text)
 
-    return render_template("index.html", sentiment=sentiment, text=text)
+    return render_template("index.html", result=result, text=text)
 
 
 @app.route("/predict", methods=["POST"])
 def predict():
     data = request.get_json(silent=True) or {}
     text = data.get("text", "")
-    return jsonify({
-        "sentiment": simple_sentiment(text),
-        "text": text
-    })
+    result = vader_analyze(text)
+    return jsonify({"text": text, **result})
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, port=5000)
