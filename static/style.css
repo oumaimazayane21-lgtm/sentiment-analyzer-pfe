@@ -140,3 +140,11 @@ small.hint {
 .bar-fill.positive{ background: #22c55e; }
 .bar-fill.negative{ background: #ef4444; }
 .bar-fill.neutral{  background: #f59e0b; }
+button {
+    transition: all 0.3s ease;
+}
+
+button:hover {
+    transform: scale(1.03);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+}
